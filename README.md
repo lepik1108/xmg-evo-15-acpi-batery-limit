@@ -1,6 +1,7 @@
 # XMG EVO 15 (E25) Battery Charge Control
 
-Prolong your XMG laptop battery life with: 
+Prolong your XMG laptop battery life with:
+
 Linux battery charge threshold management for the **XMG EVO 15 (E25)** and compatible TongFang AMD Strix Point platforms (AMI BIOS). 
 
 This project provides a native Linux kernel module that interfaces directly with the Embedded Controller (EC) register `0x07B9` via the ACPI WMI pipeline (`\_SB.AMW0.WMBC`). By registering standard power supply attributes, it natively unlocks battery threshold controls in desktop environments like KDE Plasma, GNOME, and Niri/Waybar setups.
