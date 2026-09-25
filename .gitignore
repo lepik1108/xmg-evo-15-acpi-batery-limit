@@ -1,0 +1,11 @@
+# Kernel module build artifacts and compiled files
+kernel_module/build/
+*.ko
+*.o
+*.mod
+*.mod.c
+*.order
+*.symvers
+.tmp_versions/
+.cache/
+

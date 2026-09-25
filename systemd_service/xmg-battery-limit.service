@@ -1,0 +1,13 @@
+[Unit]
+Description=Set XMG EVO 15 Battery Charge Limit via Kernel Module
+After=sys-subsystem-power_supply-devices-BAT0.device power-supply.target multi-user.target
+Wants=power-supply.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/xmg-set-charge-limit 80
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target suspend.target hibernate.target hybrid-sleep.target
+

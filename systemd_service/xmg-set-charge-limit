@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Default to 80 if no argument provided
+LIMIT="${1:-80}"
+
+if [ "$LIMIT" -lt 1 ] || [ "$LIMIT" -gt 100 ]; then
+    echo "Error: Charge limit must be between 1 and 100" >&2
+    exit 1
+fi
+
+SYSFS_PATH="/sys/class/power_supply/BAT0/charge_control_end_threshold"
+
+if [ ! -f "$SYSFS_PATH" ]; then
+    echo "Error: XMG battery kernel module is not loaded or BAT0 is missing." >&2
+    exit 1
+fi
+
+echo "$LIMIT" > "$SYSFS_PATH"
+echo "XMG battery charge limit successfully set to ${LIMIT}% via kernel module."
+
