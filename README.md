@@ -27,51 +27,90 @@ git push -u origin main
 ## Repository Structure
 
 ```shell
-xmg-acpi-bat/
-├── docs/
-│   └── charge_limit_niri_ui.png
-├── kernel_module/
-│   ├── Makefile
-│   ├── build_and_test.sh
-│   └── xmg_ec_battery.c
-├── systemd_service/
-│   ├── enable_and_test.sh
-│   ├── xmg-battery-limit.service
-│   └── xmg-set-charge-limit
-└── README.md
+	xmg-acpi-bat/
+	├── docs/
+	│   └── charge_limit_niri_ui.png
+	├── kernel_module/
+	│   ├── Makefile
+	│   ├── install.sh
+	│   └── xmg_ec_battery.c
+	├── systemd_service/
+	│   ├── install.sh
+	│   ├── xmg-battery-limit.service
+	│   └── xmg-set-charge-limit
+	└── README.md
 ```
 
-## Installation & Usage
+# Installation & Usage
+
+## Option 1: Native Kernel Module (Recommended)
 
 ### 1. Prerequisites
 Ensure you have your kernel headers and a build toolchain installed:
 - Arch Linux: `sudo pacman -S linux-headers base-devel clang llvm`
 - Ubuntu/Debian: `sudo apt install build-essential linux-headers-$(uname -r)`
 
-### 2. Build and Test the Kernel Module
+### 2. Build and Install the Kernel Module
 Navigate into the `kernel_module/` directory and run the helper script to compile and insert the module dynamically:
 ```shell
-cd kernel_module
-./build_and_test.sh
+	cd kernel_module
+	./install.sh
 ```
 
-Once loaded, check your sysfs node and current status:
-Bash
+### 3. Verify sysfs Node
+
+Once loaded, check your power supply attribute and its limit setting:
 
 ```shell
-cat /sys/class/power_supply/BAT0/charge_control_end_threshold
-echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+	cat /sys/class/power_supply/BAT0/charge_control_end_threshold
+	echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
 ```
 
-### 3. Make It Permanent on Boot
-To ensure the kernel module loads automatically on every system boot:
- 1. Copy or install your compiled .ko module to your kernel modules tree.
- 2. Register the module in /etc/modules-load.d/xmg-battery.conf:
+### 4. Make It Permanent on Boot
+To ensure the kernel module loads automatically on every system boot, register the module name in `/etc/modules-load.d/xmg-battery.conf`:
 ```shell
-xmg_ec_battery
+	echo "xmg_ec_battery" | sudo tee /etc/modules-load.d/xmg-battery.conf
+```
+
+## Option 2: Systemd Service Fallback (Userland `acpi_call`)
+
+If you prefer not to compile a kernel module and want to use userland `acpi_call` instead:
+
+### 1. Install and Load `acpi_call`
+- **Arch Linux:**
+```shell
+	sudo pacman -S acpi_call dkms
+	sudo modprobe acpi_call
+``` 
+
+- **Ubuntu/Debian:**
+```shell
+	sudo apt install acpi-call-dkms
+	sudo modprobe acpi_call
+``` 
+ 
+### 2. Install and Enable the Service
+Navigate to the `systemd_service/` directory and run the installer script:
+
+```shell
+	cd systemd_service
+	./install.sh
+```
+
+### 3. Check the service status:
+ 
+```shell
+	sudo systemctl status xmg-battery-limit.service
+```
+
+### 4. Disable and Remove the Systemd Service
+If your desktop environment (like GNOME, KDE, XFCE, Hyprland, Niri,...) natively manages the battery threshold using the kernel module's sysfs node, you can disable and clean up the fallback service:
+```shell
+sudo systemctl disable --now xmg-battery-limit.service
+sudo rm /etc/systemd/system/xmg-battery-limit.service
+sudo rm /usr/local/bin/xmg-set-charge-limit
+sudo systemctl daemon-reload
 ```
 
 ## Useful References & Acknowledgments
-- [enthusiast](https://8051enthusiast.github.io/2021/07/05/001-EC_legacy.html)
-- EC Hacking Guide: Writing a custom EC driver / investigating ACPI interfaces
-- Community Context: TongFang/Clevo ACPI reverse-engineering patterns for Linux power management.
+- [EC Hacking Guide by 8051enthusiast](https://8051enthusiast.github.io/2021/07/05/001-EC_legacy.html)
