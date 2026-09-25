@@ -67,8 +67,8 @@ echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
 To ensure the kernel module loads automatically on every system boot:
  1. Copy or install your compiled .ko module to your kernel modules tree.
  2. Register the module in /etc/modules-load.d/xmg-battery.conf:
-```text
-    xmg_ec_battery
+```shell
+xmg_ec_battery
 ```
 
 ## Useful References & Acknowledgments
