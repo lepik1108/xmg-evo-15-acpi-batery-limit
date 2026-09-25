@@ -27,18 +27,18 @@ git push -u origin main
 ## Repository Structure
 
 ```shell
-	xmg-acpi-bat/
-	├── docs/
-	│   └── charge_limit_niri_ui.png
-	├── kernel_module/
-	│   ├── Makefile
-	│   ├── install.sh
-	│   └── xmg_ec_battery.c
-	├── systemd_service/
-	│   ├── install.sh
-	│   ├── xmg-battery-limit.service
-	│   └── xmg-set-charge-limit
-	└── README.md
+xmg-acpi-bat/
+├── docs/
+│   └── charge_limit_niri_ui.png
+├── kernel_module/
+│   ├── Makefile
+│   ├── install.sh
+│   └── xmg_ec_battery.c
+├── systemd_service/
+│   ├── install.sh
+│   ├── xmg-battery-limit.service
+│   └── xmg-set-charge-limit
+└── README.md
 ```
 
 # Installation & Usage
@@ -53,8 +53,8 @@ Ensure you have your kernel headers and a build toolchain installed:
 ### 2. Build and Install the Kernel Module
 Navigate into the `kernel_module/` directory and run the helper script to compile and insert the module dynamically:
 ```shell
-	cd kernel_module
-	./install.sh
+cd kernel_module
+./install.sh
 ```
 
 ### 3. Verify sysfs Node
@@ -62,14 +62,14 @@ Navigate into the `kernel_module/` directory and run the helper script to compil
 Once loaded, check your power supply attribute and its limit setting:
 
 ```shell
-	cat /sys/class/power_supply/BAT0/charge_control_end_threshold
-	echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+cat /sys/class/power_supply/BAT0/charge_control_end_threshold
+echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
 ```
 
 ### 4. Make It Permanent on Boot
 To ensure the kernel module loads automatically on every system boot, register the module name in `/etc/modules-load.d/xmg-battery.conf`:
 ```shell
-	echo "xmg_ec_battery" | sudo tee /etc/modules-load.d/xmg-battery.conf
+echo "xmg_ec_battery" | sudo tee /etc/modules-load.d/xmg-battery.conf
 ```
 
 ## Option 2: Systemd Service Fallback (Userland `acpi_call`)
@@ -79,28 +79,28 @@ If you prefer not to compile a kernel module and want to use userland `acpi_call
 ### 1. Install and Load `acpi_call`
 - **Arch Linux:**
 ```shell
-	sudo pacman -S acpi_call dkms
-	sudo modprobe acpi_call
+sudo pacman -S acpi_call dkms
+sudo modprobe acpi_call
 ``` 
 
 - **Ubuntu/Debian:**
 ```shell
-	sudo apt install acpi-call-dkms
-	sudo modprobe acpi_call
+sudo apt install acpi-call-dkms
+sudo modprobe acpi_call
 ``` 
  
 ### 2. Install and Enable the Service
 Navigate to the `systemd_service/` directory and run the installer script:
 
 ```shell
-	cd systemd_service
-	./install.sh
+cd systemd_service
+./install.sh
 ```
 
 ### 3. Check the service status:
  
 ```shell
-	sudo systemctl status xmg-battery-limit.service
+sudo systemctl status xmg-battery-limit.service
 ```
 
 ### 4. Disable and Remove the Systemd Service
